@@ -21,9 +21,13 @@ void Ros2SocketCan::init()
 
     rclcpp::executors::MultiThreadedExecutor exec;
 
-    publisher_ 		= this->create_publisher<can_msgs::msg::Frame>(topicname_receive_.str(), 10);
+    publisher_ 		= this->create_publisher<can_msgs::msg::Frame>(
+      topicname_receive_.str(),
+      rclcpp::QoS(rclcpp::KeepLast(5)).transient_local().reliable()
+    );
     subscription_ 	= this->create_subscription<can_msgs::msg::Frame>(
-                            topicname_transmit_.str(), 10,
+                            topicname_transmit_.str(),
+                            rclcpp::QoS(rclcpp::KeepLast(5)),
                             std::bind(&Ros2SocketCan::canPublisher, this, _1));
 
     strcpy(ifr.ifr_name, canname.c_str());
